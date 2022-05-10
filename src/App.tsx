@@ -1,4 +1,4 @@
-import {FC, useState} from "react";
+import {FC, useEffect, useState} from "react";
 
 const generateMatrix = (m: number, n: number): number[][] => {
   const matrix = [];
@@ -11,11 +11,15 @@ const generateMatrix = (m: number, n: number): number[][] => {
   return matrix;
 }
 
+const matrixA = generateMatrix(10, 10);
+const matrixB = generateMatrix(10, 10);
+
+
 const App: FC = () => {
-  const matrixA = generateMatrix(3, 3);
-  const matrixB = generateMatrix(3, 3);
+
 
   const [resultMatrix, setResultMatrix] = useState<number[][]>([]); 
+  const [time, setTime] = useState();
 
   const handleCalcualte = async () => {
     const response = await fetch("http://127.0.0.1:5000/", {
@@ -30,7 +34,8 @@ const App: FC = () => {
           "Content-type": "application/json; charset=UTF-8"
       }
     });
-    const result = await response.json();
+    const {time, result} = await response.json();
+    setTime(time);
     setResultMatrix(result);
   }
 
@@ -66,7 +71,7 @@ const App: FC = () => {
         </div>
       </div>
       <h1 className="text-center font-bold text-lg ">Result Matrix</h1>
-      {/* <p className="text-center mb-2">Multi-core 343ms; Silgle-core 500ms</p> */}
+      <p className="text-center mb-2">{time && `Multi-core ${time}ms`}</p>
       <div className="flex items-start justify-center gap-4">
         <div>
           <div className="flex flex-col h-auto gap-2">

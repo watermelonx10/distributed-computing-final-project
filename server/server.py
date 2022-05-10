@@ -1,4 +1,5 @@
 import json
+import time
 from flask import Flask
 from flask import request
 from flask_cors import cross_origin
@@ -110,8 +111,11 @@ def hello_world():
     data = request.get_json()
     matrixA = data["matrixA"]
     matrixB = data["matrixB"]
-
-    return json.dumps(multiplyMatries(matrixA, matrixB).tolist())
+    start = round(time.time())
+    result = multiplyMatries(matrixA, matrixB).tolist()
+    end = round(time.time())
+    diff = end - start
+    return json.dumps({"time": diff, "result": result})
 
 
 if __name__ == "__main__":
