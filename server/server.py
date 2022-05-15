@@ -1,13 +1,16 @@
 import json
 import time
+from unittest import result
 from flask import Flask
 from flask import request
 from flask_cors import cross_origin
 
 import pyopencl as cl
 
-import pyopencl as cl
+import os
 import numpy
+
+os.environ['PYOPENCL_CTX'] = '0'
 
 
 def multiplyMatries(A, B):
@@ -102,6 +105,14 @@ def multiplyMatries(A, B):
     return result
 
 
+def serialMultiplyMatries(A, B):
+    matrixA = numpy.array(A)
+    matrixB = numpy.array(B)
+
+    result = numpy.dot(matrixA, matrixB)
+    return result
+
+
 app = Flask(__name__)
 
 
@@ -111,11 +122,18 @@ def hello_world():
     data = request.get_json()
     matrixA = data["matrixA"]
     matrixB = data["matrixB"]
-    start = round(time.time())
+
+    start = round(time.time_ns())
     result = multiplyMatries(matrixA, matrixB).tolist()
-    end = round(time.time())
-    diff = end - start
-    return json.dumps({"time": diff, "result": result})
+    end = round(time.time_ns())
+    multiTime = (end - start) / 10**6
+
+    start = round(time.time_ns())
+    result = serialMultiplyMatries(matrixA, matrixB).tolist()
+    end = round(time.time_ns())
+    serialTime = (end - start) / 10**6
+
+    return json.dumps({"multiTime": multiTime, "result": result, "serialTime": serialTime})
 
 
 if __name__ == "__main__":
